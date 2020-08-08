@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>target/gatling.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <!-- keep 6 days' worth of history -->
+            <maxHistory>6</maxHistory>
+            <fileNamePattern>target/archive/karate.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger [%thread] %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>4000</queueSize>
+        <meterLogRequests>true</meterLogRequests>
+        <appender-ref ref="FILE" />
+        <level>ERROR</level>
+    </appender>
+
+    <logger name="com.intuit" level="ERROR"/>
+    <logger name="io.gatling.http.client.impl.HttpAppHandler" level="ERROR" />
+    <logger name="io.gatling.http.engine.tx.HttpTxExecutor" level="ERROR" />
+    <logger name="io.gatling.graphite.sender.TcpSender" level="ERROR" />
+    <logger name="io.gatling.graphite.message.GraphiteMetrics" level="ERROR" />
+    <logger name="io.gatling.http.Predef" level="ERROR"/>
+    <logger name="io.gatling.http.engine.response" level="TRACE" />
+
+    <root level="warn">
+        <appender-ref ref="FILE_ASYNC" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
