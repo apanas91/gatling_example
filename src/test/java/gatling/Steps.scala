@@ -6,20 +6,21 @@ object Steps {
   def getUserList = {
     exec(
       http("get user")
-        .get("user")
+        .get("api/v1/user")
         .check(status.is(200))
+        .check(jsonPath("$[0].id").notNull.saveAs("recipientId"))
     )
   }
 
   def authentication = {
     exec(
       http("login")
-        .post("authenticate")
+        .post("api/v1/authenticate")
         .body(
           StringBody(
             """
               |{
-              |"login": "admin",
+              |"username": "admin",
               |"password": "admin"
               |}
             """.stripMargin
@@ -34,7 +35,7 @@ object Steps {
   def getAllMessages = {
     exec(
       http("get messages")
-        .get("message")
+        .get("api/v1/message")
         .header("Authorization", "Bearer ${token}")
         .check(status.is(200))
     )
@@ -43,10 +44,14 @@ object Steps {
   def postMessage = {
     exec(
       http("post message")
-        .post("message")
+        .post("api/v1/message")
         .body(
           StringBody(
-            """ {"text": "Hello, Gatling"}""".stripMargin
+
+            """ {
+                  "text": "Hello, Gatling",
+                  "recipient": ${recipientId}
+                }""".stripMargin
           )
         )
         .header("Authorization", "Bearer ${token}")
@@ -59,7 +64,7 @@ object Steps {
   def putMessage = {
     exec(
       http("put message")
-        .put("message/${messageId}")
+        .put("api/v1/message/${messageId}")
         .body(
           StringBody(
             """ { "text": "edited text" } """.stripMargin
@@ -74,7 +79,7 @@ object Steps {
   def getMessage = {
     exec(
       http("get message by id")
-        .get("message/${messageId}")
+        .get("api/v1/message/${messageId}")
         .header("Authorization", "Bearer ${token}")
         .header("Content-type", "application/json")
         .check(status.is(200))
@@ -84,7 +89,7 @@ object Steps {
   def deleteMessage = {
     exec(
       http("delete message")
-        .delete("message/${messageId}")
+        .delete("api/v1/message/${messageId}")
         .header("Authorization", "Bearer ${token}")
         .header("Content-type", "application/json")
         .check(status.is(200))
