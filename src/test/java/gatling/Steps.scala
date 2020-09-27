@@ -18,12 +18,10 @@ object Steps {
         .post("api/v1/authenticate")
         .body(
           StringBody(
-            """
-              |{
+            """{
               |"username": "admin",
               |"password": "admin"
-              |}
-            """.stripMargin
+              |} """.stripMargin
           )
         )
         .header("Content-type", "application/json")
@@ -47,7 +45,6 @@ object Steps {
         .post("api/v1/message")
         .body(
           StringBody(
-
             """ {
                   "text": "Hello, Gatling",
                   "recipient": ${recipientId}
@@ -93,6 +90,34 @@ object Steps {
         .header("Authorization", "Bearer ${token}")
         .header("Content-type", "application/json")
         .check(status.is(200))
+    )
+  }
+
+  val soapRequestHeaders = Map(
+    "accept-encoding" -> "gzip, deflate",
+    "Connection" -> "Keep-Alive",
+    "Content-Type" -> "text/xml;charset=UTF-8",
+    "SOAPAction" -> "GetUserByIdRequest"
+  )
+
+  val soapRequestBody =
+    """
+     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="service/model/soap/userservice">
+          <soapenv:Header/>
+           <soapenv:Body>
+               <user:GetUserByIdRequest>
+                 <user:id>1</user:id>
+               </user:GetUserByIdRequest>
+         </soapenv:Body>
+       </soapenv:Envelope>
+    """.stripMargin
+
+  def soapTest = {
+    exec(
+      http("soap req test")
+        .post("soap")
+        .body(StringBody(soapRequestBody))
+        .headers(soapRequestHeaders)
     )
   }
 }

@@ -11,4 +11,5 @@ object Scenario {
     .exec(putMessage)
     .exec(getAllMessages)
     .exec(deleteMessage)
+    .exec(soapTest)
 }
